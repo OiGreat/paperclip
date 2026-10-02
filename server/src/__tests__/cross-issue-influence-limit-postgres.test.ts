@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { and, eq } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { afterAll, afterEach, beforeAll, describe, expect, it } from "vitest";
 import {
   activityLog,
@@ -202,6 +202,25 @@ describeEmbeddedPostgres("cross-issue influence limit PostgreSQL serialization",
     expect(recorded).toEqual([
       { action: "issue.cross_issue_influence_observed", entityId: ownedIssueId },
     ]);
+  });
+
+  // Third review finding: the sole-checkout tally runs inside the transaction that
+  // holds the run row lock, so an unindexed scan there would slow every write it gates.
+  // Asserting the index exists is what stops it being dropped later by a schema edit
+  // that looks unrelated — the cost would reappear silently, as latency rather than a
+  // failing test.
+  it("has an index backing the held-checkout tally", async () => {
+    const [index] = await db.execute(sql`
+      SELECT indexdef FROM pg_indexes
+      WHERE tablename = 'issues' AND indexname = 'issues_company_checkout_run_idx'
+    `) as unknown as Array<{ indexdef: string }>;
+
+    expect(index, "migration 0294 did not create issues_company_checkout_run_idx")
+      .toBeDefined();
+    // Leading column must be `company_id`, matching the guard's own `where`, or the
+    // index exists without serving the query it was added for.
+    expect(index.indexdef).toContain("company_id");
+    expect(index.indexdef).toContain("checkout_run_id");
   });
 
   // Second review finding: the sole-checkout exemption has to be *sole*. Checkout writes
