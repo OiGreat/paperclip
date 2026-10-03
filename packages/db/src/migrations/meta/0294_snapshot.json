@@ -1,5 +1,5 @@
 {
-  "id": "c701f8da-c2bf-4f59-a085-e6e7594aaa5c",
+  "id": "66a0b3c9-91bb-46b8-a868-a6facedbc14b",
   "prevId": "d0c40f4e-c2c5-4efd-bc15-c6ae5632047d",
   "version": "7",
   "dialect": "postgresql",
@@ -31922,27 +31922,6 @@
           "method": "btree",
           "with": {}
         },
-        "issues_company_checkout_run_idx": {
-          "name": "issues_company_checkout_run_idx",
-          "columns": [
-            {
-              "expression": "company_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "checkout_run_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "issues_company_parent_idx": {
           "name": "issues_company_parent_idx",
           "columns": [
@@ -46226,6 +46205,27 @@
             }
           ],
           "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "tool_mcp_gateway_tokens_expiry_idx": {
+          "name": "tool_mcp_gateway_tokens_expiry_idx",
+          "columns": [
+            {
+              "expression": "expires_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
           "concurrently": false,
           "method": "btree",
           "with": {}
